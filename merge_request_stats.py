@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import warnings
+from argparse import ArgumentParser
 from datetime import datetime
 from typing import Any
 from typing import Dict
@@ -61,11 +62,11 @@ class MergeRequestStats:
         return self.group.mergerequests.list(iterator=True)
 
     @silence_urllib3_warnings
-    def calculate(self) -> None:
+    def calculate(self, days: int) -> None:
         """Calculates statistics for the group.
 
         Does the following:
-            1. Checks MR's for the past 7 days
+            1. Checks MR's for the past {days} days
             2. Gets total counts of MR's per author and identifies which repos they were into
         """
         time_now = datetime.now()
@@ -76,7 +77,7 @@ class MergeRequestStats:
                 "%Y-%m-%dT%H:%M:%S.%fZ",
             )
             time_delta = time_now - created_date
-            if abs(time_delta.days) > 7:
+            if abs(time_delta.days) > days:
                 break
 
             username: str = merge_request.author["username"]
@@ -100,9 +101,19 @@ class MergeRequestStats:
 
 
 if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument(
+        "-d",
+        "--days",
+        type=int,
+        help="Calculates stats for the past N days",
+        default=7,
+    )
+    args = parser.parse_args()
+
     merge_request_stats: MergeRequestStats = MergeRequestStats(
         os.getenv("GITLAB_URL"),
         os.getenv("GITLAB_API_ACCESS_TOKEN"),
         os.getenv("GITLAB_GROUP"),
     )
-    merge_request_stats.calculate()
+    merge_request_stats.calculate(args.days)
