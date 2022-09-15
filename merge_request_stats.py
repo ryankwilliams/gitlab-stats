@@ -68,11 +68,9 @@ class MergeRequestStats:
             1. Checks MR's for the past 7 days
             2. Gets total counts of MR's per author and identifies which repos they were into
         """
-        merge_requests = self.get_merge_requests()
-
         time_now = datetime.now()
 
-        for index, merge_request in enumerate(merge_requests, start=1):
+        for merge_request in self.get_merge_requests():
             created_date = datetime.strptime(
                 merge_request.created_at,
                 "%Y-%m-%dT%H:%M:%S.%fZ",
