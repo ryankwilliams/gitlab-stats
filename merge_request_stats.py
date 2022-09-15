@@ -86,18 +86,17 @@ class MergeRequestStats:
             if username not in self.authors:
                 self.authors[username] = {
                     "name": merge_request.author["name"],
-                    "mr_count": 0,
+                    "total": 0,
                     "projects": {},
                 }
 
-            self.authors[username]["mr_count"] += 1
+            self.authors[username]["total"] += 1
 
             project_name: str = merge_request.references["full"].split("!")[0]
             if project_name not in self.authors[username]["projects"]:
-                self.authors[username]["projects"][project_name] = {
-                    "mr_count": 0,
-                }
-            self.authors[username]["projects"][project_name]["mr_count"] += 1
+                self.authors[username]["projects"][project_name] = 0
+
+            self.authors[username]["projects"][project_name] += 1
 
         print(json.dumps(self.authors, indent=4))
 
