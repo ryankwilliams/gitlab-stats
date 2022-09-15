@@ -109,11 +109,17 @@ if __name__ == "__main__":
         help="Calculates stats for the past N days",
         default=7,
     )
+    parser.add_argument(
+        "-g",
+        "--group",
+        type=str,
+        help="GitLab group to calculate stats for",
+    )
     args = parser.parse_args()
 
     merge_request_stats: MergeRequestStats = MergeRequestStats(
         os.getenv("GITLAB_URL"),
         os.getenv("GITLAB_API_ACCESS_TOKEN"),
-        os.getenv("GITLAB_GROUP"),
+        args.group,
     )
     merge_request_stats.calculate(args.days)
